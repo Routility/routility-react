@@ -1,0 +1,52 @@
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>React + Redux + Routility Demo</title>
+</head>
+<body>
+  <div id="app"></div>
+
+  <script src="https://npmcdn.com/routility@latest/dist/routility.js"></script>
+  <script src="https://npmcdn.com/react@latest/dist/react.js"></script>
+  <script src="https://npmcdn.com/redux@latest/dist/redux.js"></script>
+  <script src="https://npmcdn.com/react-redux@latest/dist/react-redux.js"></script>
+  <script src="/routility-react.js"></script>
+  <script>
+    var store = Redux.createStore(function (state, action) {
+      switch (action.type) {
+      case 'ROUTE':
+        return action.data;
+      default:
+        return state;
+      }
+    });
+
+    var r = Routility.r;
+    var redirect = Routility.redirect;
+
+    var routes = (
+      r('/', 'root', [
+        redirect('/', '/sign-up'),
+        redirect('/sign-up', '/login'),
+        r('/login', 'login'),
+        r('/user/:id', 'user', [
+          r('/', 'index'),
+          r('/profile', 'profile')
+        ]),
+        r('/about/*path', 'about', [
+          r('/', 'index'),
+          r('/detail', 'detail')
+        ])
+      ])
+    );
+
+    store.subscribe(function () {
+      console.log(store.getState());
+    });
+
+    var navTo = Routility.start(routes, function (state) {
+      store.dispatch({ type: 'ROUTE', data: state });
+    }, { browserHistory: true });
+  </script>
+</body>
+</html>
